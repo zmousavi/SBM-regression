@@ -3,11 +3,14 @@ rm (list=ls())
 #Idea: 'm' SBM graphs with same block matrix. 
 #Simulate SBM graphs - ASE to estimate B matrix (call entries p). 
 #compute an estimate for var(p_hat-p) using Minh's theorem.
-#use the estimate to adjust measurement error 
 
+#set up regression with p_hat
+#Using Minh's theorem construct an estimate for var(p_hat-p) 
+#use the estimate to adjust measurement error 
 
 pi_k= 0.5
 pi_l = 0.5 
+
 
 graph_size = 100
 
