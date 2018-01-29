@@ -1,10 +1,12 @@
 rm (list=ls())
 
 
-#Idea: 'm' SBM graphs with same block matrix. 
-#Simulate block matrix entries using Minh's var(p_hat-p) theorem.
+#Idea: 'm' SBM graphs with same block matrix, B, with entries [p11, p12; p21, p22] 
+#Simulate var(p_hat-p) per Minh's theorem in order to generate p_hat.
 #Note: we do not generate SBM graphs here.
-#compute an estimate for var(p_hat-p)
+
+#set up graph regression with p_hat 
+#Using Minh's theorem construct an estimate for var(p_hat-p) 
 #use the estimate to adjust measurement error 
 
 pi_k= 0.5
