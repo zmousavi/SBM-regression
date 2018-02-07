@@ -1,16 +1,14 @@
 rm (list=ls())
-
+require("Matrix")
+require("igraph")
 #Idea: 'm' SBM graphs with same block matrix. 
 #Simulate SBM graphs - ASE to estimate B matrix (call entries p). 
 #compute an estimate for var(p_hat-p) using Minh's theorem.
-
-#set up regression with p_hat
-#Using Minh's theorem construct an estimate for var(p_hat-p) 
 #use the estimate to adjust measurement error 
+
 
 pi_k= 0.5
 pi_l = 0.5 
-
 
 graph_size = 100
 
@@ -25,9 +23,12 @@ beta_naive_se = c()
 beta_adj_se = c()
 
 
-m = 50
+m = 100 # number of graphs 
+set.seed(89)
 p11_true = runif(n=m,  0.5, 0.6) 
+set.seed(79)
 p12_true = runif(n=m,  0.5, 0.6) 
+set.seed(439)
 p22_true = runif(n=m, 0.5, 0.6) 
 
 P_true = cbind(p11_true, p12_true, p22_true)
@@ -217,73 +218,83 @@ b3_adj[z] = beta_adj[[z]][4]
 ###########
 ###########
 ###########
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b0_true, b0_naive,  b0_adj,notch=TRUE, 
-        main=bquote(paste("b0 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+##########
+
+setwd("~/Desktop/redata/Feb6")
+dev.new()
+pdf("b0_estimate_sbm_real.pdf", 7, 5)
+#par(mar=c(7.1,4.1,4.1,2.1))
+boxplot(b0_true, b0_naive,  b0_adj,  notch=TRUE, 
+        #main=bquote(paste("b1 Estimate","\n graph_size:", n , "\n mc_runs:",length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = beta_0, col="red", lty=2, lwd=0.5)
+abline(h = b1_true, col="red", lty=3, lwd=0.2)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true, b1_naive,  b1_adj,notch=TRUE, 
-        main=bquote(paste("b1 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b11_estimate_real.pdf", 7, 5)
+boxplot(b1_true, b1_naive,  b1_adj,  notch=TRUE, 
+        #main=bquote(paste("b1 Estimate","\n graph_size:", n , "\n mc_runs:",length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = b1_true, col="red", lty=2, lwd=0.5)
+abline(h = b1_true, col="red", lty=3, lwd=0.2)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true, b2_naive,  b2_adj, notch=TRUE, 
-        main=bquote(paste("b2 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b12_estimate_real.pdf", 7, 5)
+boxplot(b2_true, b2_naive,  b2_adj,  notch=TRUE, 
+        main=bquote(paste("b2 Estimate", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted "))
-abline(h = b2_true, col="red", lty=2, lwd=0.5)
+        las=2, names=c("True", "Naive", "Adjusted" ))
+abline(h = b2_true, col="red", lty=3, lwd=0.2)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true, b3_naive,  b3_adj,notch=TRUE, 
-        main=bquote(paste("b3 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b22_estimate_real.pdf", 7, 5)
+boxplot(b3_true, b3_naive,  b3_adj,  notch=TRUE, 
+        main=bquote(paste("b3 Estimate", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = b3_true, col="red", lty=2, lwd=0.5)
+abline(h = b3_true, col="red", lty=3, lwd=0.2)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b0_true_se, b0_naive_se,  b0_adj_se,notch=TRUE, 
-        main=bquote(paste("b0 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b0_MSE_sbm_real.pdf", 7, 5)
+boxplot(b0_true_se, b0_naive_se,  b0_adj_se, notch=TRUE, 
+        #   main=bquote(paste("b1 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true_se, b1_naive_se,  b1_adj_se,notch=TRUE, 
-        main=bquote(paste("b1 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b11_MSE_real.pdf", 7, 5)
+boxplot(b1_true_se, b1_naive_se,  b1_adj_se, notch=TRUE, 
+        #   main=bquote(paste("b1 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
+dev.new()
+pdf("b12_MSE_real.pdf", 7, 5)
 boxplot(b2_true_se, b2_naive_se,  b2_adj_se, notch=TRUE, 
-        main=bquote(paste("b2 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+        # main=bquote(paste("b2 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
+dev.off()
 
+dev.new()
+pdf("b22_MSE_real.pdf", 7, 5)
 par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true_se, b3_naive_se,  b3_adj_se,notch=TRUE, 
-        main=bquote(paste("b3 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+boxplot(b3_true_se, b3_naive_se,  b3_adj_se, notch=TRUE, 
+        #  main=bquote(paste("b3 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
+dev.off()
 
-########
-########
-########
-
-
-# par(mar=c(7.1,4.1,4.1,2.1))
-# boxplot(beta_all_true_se, beta_all_naive_se,  beta_all_adj_se,notch=TRUE, 
-#         main=bquote(paste("beta_all Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
-#         cex.main=0.5,
-#         las=2, names=c("True", "Naive", "Adjusted"))
-# abline(h = b0_true, col="red", lty=2, lwd=0.5)
 
 
 #CI 

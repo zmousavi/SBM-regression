@@ -1,18 +1,16 @@
 rm (list=ls())
+require("Matrix")
 
-
-#Idea: 'm' SBM graphs with same block matrix, B, with entries [p11, p12; p21, p22] 
-#Simulate var(p_hat-p) per Minh's theorem in order to generate p_hat.
+#Idea: 'm' SBM graphs with same block matrix. 
+#Simulate block matrix entries using Minh's var(p_hat-p) theorem.
 #Note: we do not generate SBM graphs here.
-
-#set up graph regression with p_hat 
-#Using Minh's theorem construct an estimate for var(p_hat-p) 
+#compute an estimate for var(p_hat-p)
 #use the estimate to adjust measurement error 
 
 pi_k= 0.5
 pi_l = 0.5 
 
-graph_size = 50
+graph_size = 100
 
 beta_0 = 1
 beta_1=1
@@ -26,8 +24,11 @@ beta_adj_se = c()
 
 
 m = 100 # number of graphs 
+set.seed(83)
 p11_true = runif(n=m,  0.5, 0.6) 
+set.seed(79)
 p12_true = runif(n=m,  0.5, 0.6) 
+set.seed(439)
 p22_true = runif(n=m, 0.5, 0.6) 
 
 P_true = cbind(p11_true, p12_true, p22_true) #B matrix entries 
@@ -57,7 +58,6 @@ beta_all_adj_se =c()
 
 
 mc_runs = 100
-z=1
 for (z in 1:mc_runs){
 
   if (z%%100 ==0){
@@ -173,73 +173,83 @@ b3_adj[z] = beta_adj[[z]][4]
 ###########
 ###########
 ###########
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b0_true, b0_naive,  b0_adj,notch=TRUE, 
-        main=bquote(paste("b0 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = beta_0, col="red", lty=2, lwd=0.5)
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true, b1_naive,  b1_adj,notch=TRUE, 
-        main=bquote(paste("b1 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+setwd("~/Desktop/redata/Feb6")
+dev.new()
+pdf("b0_estimate_sbm_sim.pdf", 7, 5)
+#par(mar=c(7.1,4.1,4.1,2.1))
+boxplot(b0_true, b0_naive,  b0_adj,  notch=TRUE, 
+        #main=bquote(paste("b1 Estimate","\n graph_size:", n , "\n mc_runs:",length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = b1_true, col="red", lty=2, lwd=0.5)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true, b2_naive,  b2_adj, notch=TRUE, 
-        main=bquote(paste("b2 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b11_estimate_sim.pdf", 7, 5)
+boxplot(b1_true, b1_naive,  b1_adj,  notch=TRUE, 
+        #main=bquote(paste("b1 Estimate","\n graph_size:", n , "\n mc_runs:",length(b1_true), "\n m:", m)), 
         cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted "))
-abline(h = b2_true, col="red", lty=2, lwd=0.5)
+        las=2, names=c("True", "Naive", "Adjusted"))
+abline(h = b1_true, col="red", lty=2, lwd=0.5)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true, b3_naive,  b3_adj,notch=TRUE, 
-        main=bquote(paste("b3 Estimate", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b12_estimate_sim.pdf", 7, 5)
+boxplot(b2_true, b2_naive,  b2_adj,  notch=TRUE, 
+        main=bquote(paste("b2 Estimate", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
+        cex.main=0.5,
+        las=2, names=c("True", "Naive", "Adjusted" ))
+abline(h = b2_true, col="red", lty=2, lwd=0.5)
+dev.off()
+
+dev.new()
+pdf("b22_estimate_sim.pdf", 7, 5)
+boxplot(b3_true, b3_naive,  b3_adj,  notch=TRUE, 
+        main=bquote(paste("b3 Estimate", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = b3_true, col="red", lty=2, lwd=0.5)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b0_true_se, b0_naive_se,  b0_adj_se,notch=TRUE, 
-        main=bquote(paste("b0 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b0_MSE_sbm_sim.pdf", 7, 5)
+boxplot(b0_true_se, b0_naive_se,  b0_adj_se, notch=TRUE, 
+        #   main=bquote(paste("b1 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true_se, b1_naive_se,  b1_adj_se,notch=TRUE, 
-        main=bquote(paste("b1 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+dev.new()
+pdf("b11_MSE_sim.pdf", 7, 5)
+boxplot(b1_true_se, b1_naive_se,  b1_adj_se, notch=TRUE, 
+        #   main=bquote(paste("b1 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
+dev.off()
 
-par(mar=c(7.1,4.1,4.1,2.1))
+dev.new()
+pdf("b12_MSE_sim.pdf", 7, 5)
 boxplot(b2_true_se, b2_naive_se,  b2_adj_se, notch=TRUE, 
-        main=bquote(paste("b2 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+       # main=bquote(paste("b2 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
+dev.off()
 
+dev.new()
+pdf("b22_MSE_sim.pdf", 7, 5)
 par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true_se, b3_naive_se,  b3_adj_se,notch=TRUE, 
-        main=bquote(paste("b3 Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
+boxplot(b3_true_se, b3_naive_se,  b3_adj_se, notch=TRUE, 
+      #  main=bquote(paste("b3 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
         cex.main=0.5,
         las=2, names=c("True", "Naive", "Adjusted"))
 abline(h = 0, col="red", lty=2, lwd=0.5)
-
-########
-########
-########
+dev.off()
 
 
-# par(mar=c(7.1,4.1,4.1,2.1))
-# boxplot(beta_all_true_se, beta_all_naive_se,  beta_all_adj_se,notch=TRUE, 
-#         main=bquote(paste("beta_all Square Error", "\n graph_size:", graph_size , "\n mc_runs:", mc_runs, "\n m:", m)), 
-#         cex.main=0.5,
-#         las=2, names=c("True", "Naive", "Adjusted"))
-# abline(h = b0_true, col="red", lty=2, lwd=0.5)
 
 
 #CI 
@@ -281,382 +291,3 @@ k = sum(b3_adj_se < b3_naive_se)
 
 
 
-
-
-
-
-###########
-###########
-###########
-###########
-###########
-###########
-###########
-###########
-###########
-par(mar=c(7.1,4.1,4.1,2.1))
- boxplot(b1_true, b1_naive,  b1_adj[abs(b1_adj)<mean(b1_adj)+3*sd(b1_adj)],notch=TRUE, 
-         main=bquote(paste("b1 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-         cex.main=0.5,
-         las=2, names=c("True", "Naive", "|Adjusted| < \n 3sd(Adjusted)"))
- abline(h = b1_true, col="red", lty=2, lwd=0.5)
- 
- par(mar=c(7.1,4.1,4.1,2.1))
- boxplot(b2_true, b2_naive,  b2_adj[abs(b2_adj)<mean(b2_adj)+3*sd(b2_adj)], notch=TRUE, 
-         main=bquote(paste("b2 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-         cex.main=0.5,
-         las=2, names=c("True", "Naive", "|Adjusted| < \n 3sd(Adjusted)"))
- abline(h = b2_true, col="red", lty=2, lwd=0.5)
- 
- par(mar=c(7.1,4.1,4.1,2.1))
- boxplot(b3_true, b3_naive,  b3_adj[abs(b3_adj)<mean(b3_adj)+3*sd(b3_adj)],notch=TRUE, 
-         main=bquote(paste("b3 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-         cex.main=0.5,
-         las=2, names=c("True", "Naive", "|Adjusted| < \n 3sd(Adjusted)"))
- abline(h = b3_true, col="red", lty=2, lwd=0.5)
- 
- par(mar=c(7.1,4.1,4.1,2.1))
- boxplot(b1_true_se, b1_naive_se,  b1_adj_se[abs(b1_adj_se)<mean(b1_adj_se)+3*sd(b1_adj_se)],notch=TRUE, 
-         main=bquote(paste("b1 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-         cex.main=0.5,
-         las=2, names=c("True", "Naive", "|Adjusted| < \n 3sd(Adjusted)"))
- abline(h = 0, col="red", lty=2, lwd=0.5)
- 
- par(mar=c(7.1,4.1,4.1,2.1))
- boxplot(b2_true_se, b2_naive_se,  b2_adj_se[abs(b2_adj_se)<mean(b2_adj_se)+3*sd(b2_adj_se)], notch=TRUE, 
-         main=bquote(paste("b2 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-         cex.main=0.5,
-         las=2, names=c("True", "Naive", "|Adjusted| < \n 3sd(Adjusted)"))
- abline(h = 0, col="red", lty=2, lwd=0.5)
- 
- par(mar=c(7.1,4.1,4.1,2.1))
- boxplot(b3_true_se, b3_naive_se,  b3_adj_se[abs(b3_adj_se)<mean(b3_adj_se)+3*sd(b1_adj_se)],notch=TRUE, 
-         main=bquote(paste("b3 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-         cex.main=0.5,
-         las=2, names=c("True", "Naive", "Adjusted < \n 3sd(Adjusted)"))
- abline(h = 0, col="red", lty=2, lwd=0.5)
- 
- det(crossprod(P_true))
- 
- mean(b3_true) 
- mean(b2_true) 
- mean(b1_true) 
- 
- mean(b3_naive) 
- mean(b2_naive) 
- mean(b1_naive) 
- 
- mean(b1_adj)
- mean(b2_adj)
- mean(b3_adj)
- 
- mean(b1_adj_ideal)
- mean(b2_adj_ideal)
- mean(b3_adj_ideal)
- 
- mean(b1_adj_cheat)
- mean(b2_adj_cheat)
- mean(b3_adj_cheat)
- 
- b1_adj_trim = b1_adj[abs(b1_adj)<3*sd(b1_adj)] 
- b2_adj_trim = b2_adj[abs(b2_adj)<3*sd(b2_adj)] 
- b3_adj_trim = b3_adj[abs(b3_adj)<3*sd(b3_adj)] 
- 
- mean( b1_adj_trim)
- mean(b2_adj_trim)
- mean(b3_adj_trim)
- 
- b1_naive_trim = b1_naive[abs(b1_adj)<3*sd(b1_adj)] 
- b2_naive_trim = b2_naive[abs(b2_adj)<3*sd(b2_adj)] 
- b3_naive_trim = b3_naive[abs(b3_adj)<3*sd(b3_adj)] 
- 
- b1_true_trim = b1_true[abs(b1_adj)<3*sd(b1_adj)] 
- b2_true_trim = b2_true[abs(b2_adj)<3*sd(b2_adj)] 
- b3_true_trim = b3_true[abs(b3_adj)<3*sd(b3_adj)] 
- 
- t.test(b1_true)$conf.int
- t.test(b1_naive)$conf.int
- t.test(b1_adj)$conf.int
- t.test(b1_adj_trim)$conf.int
- 
-t.test(b1_true, b1_naive, paired=TRUE, alternative="greater" ) 
-t.test(b1_adj, b1_naive, paired=TRUE, alternative="greater" ) 
-t.test(b1_true, b1_adj, paired=TRUE, alternative="greater" ) 
-t.test(b1_true_trim, b1_adj_trim, paired=TRUE, alternative="greater" ) 
-
-
-
-b1_adj_se_trim = b1_adj_se[abs(b1_adj_se)<mean(b1_adj_se)+3*sd(b1_adj_se)] 
-b2_adj_se_trim = b2_adj_se[abs(b2_adj_se)<mean(b2_adj_se)+3*sd(b2_adj_se)] 
-b3_adj_se_trim = b3_adj_se[abs(b3_adj_se)<mean(b3_adj_se)+3*sd(b3_adj_se)] 
-
-b1_true_se_trim = b1_true_se[abs(b1_adj_se)<mean(b1_adj_se)+3*sd(b1_adj_se)] 
-b2_true_se_trim = b2_true_se[abs(b2_adj_se)<mean(b2_adj_se)+3*sd(b2_adj_se)] 
-b3_true_se_trim = b3_true_se[abs(b3_adj_se)<mean(b3_adj_se)+3*sd(b3_adj_se)] 
-
-b1_naive_se_trim = b1_naive_se[abs(b1_adj_se)<mean(b1_adj_se)+3*sd(b1_adj_se)] 
-b2_naive_se_trim = b2_naive_se[abs(b2_adj_se)<mean(b2_adj_se)+3*sd(b2_adj_se)] 
-b3_naive_se_trim = b3_naive_se[abs(b3_adj_se)<mean(b3_adj_se)+3*sd(b3_adj_se)] 
-
-N = sum((b1_adj_se - b1_naive_se) !=0)
-k = sum(b1_adj_se < b1_naive_se)
-1 - pbinom(k, size=N, prob=0.5)
-
-N = sum(b1_adj_se_trim - b1_naive_se_trim !=0)
-k = sum(b1_adj_se_trim < b1_naive_se_trim)
-1 - pbinom(k, size=N, prob=0.5)
-
-t.test(b2_true)$conf.int
-t.test(b2_naive)$conf.int
-t.test(b2_adj)$conf.int
-t.test(b2_adj_trim)$conf.int
-
-t.test(b1_adj, b1_naive, paired=TRUE, alternative="greater" ) 
-
-t.test(b2_true, b2_naive, paired=TRUE, alternative="greater" ) 
-t.test(b2_adj, b2_naive, paired=TRUE, alternative="greater" ) 
-t.test(b2_adj_trim, b2_naive_trim, paired=TRUE, alternative="greater" ) 
-t.test(b2_true, b2_adj, paired=TRUE, alternative="greater" ) 
-t.test(b2_true_trim, b2_adj_trim, paired=TRUE, alternative="greater" ) 
-
-N = sum((b2_adj_se - b2_naive_se) !=0)
-k = sum(b2_adj_se < b2_naive_se)
-1 - pbinom(k, size=N, prob=0.5)
-
-N = sum((b2_adj_se_trim - b2_naive_se_trim) !=0)
-k = sum(b2_adj_se_trim < b2_naive_se_trim)
-1 - pbinom(k, size=N, prob=0.5)
-
-t.test(b3_true)$conf.int
-t.test(b3_naive)$conf.int
-t.test(b3_adj)$conf.int
-t.test(b3_adj_trim)$conf.int
-
-t.test(b3_true, b3_naive, paired=TRUE, alternative="greater" ) 
-t.test(b3_adj, b3_naive, paired=TRUE, alternative="greater" ) 
-t.test(b3_adj_trim, b3_naive_trim, paired=TRUE, alternative="greater" ) 
-
-t.test(b3_true, b3_adj, paired=TRUE, alternative="greater" ) 
-t.test(b3_true_trim, b3_adj_trim, paired=TRUE, alternative="greater" )
-
-#sign test 
-N = sum((b3_adj_se - b3_naive_se) !=0)
-k = sum(b3_adj_se < b3_naive_se)
-1 - pbinom(k, size=N, prob=0.5)
-
-N = sum((b3_adj_se_trim - b3_naive_se_trim) !=0)
-k = sum(b3_adj_se_trim < b3_naive_se_trim)
-1 - pbinom(k, size=N, prob=0.5)
-
-
-###########
-###########
-###########
-
-
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true, b1_naive,  b1_adj[abs(b1_adj)<2],  b1_adj_ideal[abs(b1_adj_ideal)<2], notch=TRUE, 
-        main=bquote(paste("b1 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "|Adjusted| < 2", "Adj_ideal"))
-abline(h = b1_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true, b2_naive,   b2_adj[abs(b2_adj)<2],  b2_adj_ideal[abs(b2_adj_ideal)<2], notch=TRUE, 
-        main=bquote(paste("b2 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "|Adjusted| < 2", "Adj_ideal"))
-abline(h = b2_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true, b3_naive,  b3_adj[abs(b3_adj)<2], b3_adj_ideal[abs(b3_adj_ideal)<2],notch=TRUE, 
-        main=bquote(paste("b3 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "|Adjusted| < 2", "Adj_ideal"))
-abline(h = b3_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true_se, b1_naive_se, b1_adj_se[ abs(b1_adj_se)<2],  b1_adj_ideal_se[ abs(b1_adj_ideal_se)<2] ,notch=TRUE, 
-        main=bquote(paste("b1 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "|Adjusted| < 2", "Adj_ideal"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true_se, b2_naive_se, b2_adj_se[  abs(b2_adj_se)<2], b2_adj_ideal_se[ abs(b2_adj_ideal_se)<2], notch=TRUE, 
-        main=bquote(paste("b2 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "|Adjusted| < 2", "Adj_ideal"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true_se, b3_naive_se,  b3_adj_se[ abs(b3_adj_se)<2], b3_adj_ideal_se[ abs(b3_adj_ideal_se)<2],notch=TRUE, 
-        main=bquote(paste("b3 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "|Adjusted| < 2", "Adj_ideal"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-
-###########
-###########
-###########
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true, b1_naive,  b1_adj, b1_adj_ideal ,notch=TRUE, 
-        main=bquote(paste("b1 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        ylim=c(-10, 10),
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_ideal"))
-abline(h = b1_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true, b2_naive,  b2_adj, b2_adj_ideal, notch=TRUE, 
-        main=bquote(paste("b2 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted" , "Adj_ideal"))
-abline(h = b2_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true, b3_naive,  b3_adj, b3_adj_ideal, notch=TRUE, 
-        main=bquote(paste("b3 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_ideal"))
-abline(h = b3_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true_se, b1_naive_se,  b1_adj_se, b1_adj_ideal_se, notch=TRUE, 
-        main=bquote(paste("b1 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_ideal"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true_se, b2_naive_se,  b2_adj_se, b2_adj_ideal_se, notch=TRUE, 
-        main=bquote(paste("b2 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_ideal"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true_se, b3_naive_se,  b3_adj_se, b3_adj_ideal_se, notch=TRUE, 
-        main=bquote(paste("b3 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        ylim = c(0, 10),
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_ideal"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-
-######
-######
-######
-
-
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true, b1_naive,  b1_adj,  notch=TRUE, 
-        main=bquote(paste("b1 Estimate","\n graph_size:", n , "\n mc_runs:",length(b1_true), "\n m:", m)), 
-        cex.main=0.5,
-        
-        las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = b1_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true, b2_naive,  b2_adj,  notch=TRUE, 
-        main=bquote(paste("b2 Estimate", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted" ))
-abline(h = b2_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true, b3_naive,  b3_adj,  notch=TRUE, 
-        main=bquote(paste("b3 Estimate", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = b3_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true_se, b1_naive_se,  b1_adj_se, notch=TRUE, 
-        main=bquote(paste("b1 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true_se, b2_naive_se,  b2_adj_se, notch=TRUE, 
-        main=bquote(paste("b2 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true_se, b3_naive_se,  b3_adj_se, notch=TRUE, 
-        main=bquote(paste("b3 Square Error", "\n graph_size:", n ,"\n mc_runs:", length(b1_true), "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-
-###########
-###########
-###########
-
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true, b1_naive,  b1_adj, b1_adj_cheat ,notch=TRUE, 
-        main=bquote(paste("b1 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_cheat"))
-abline(h = b1_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true, b2_naive,  b2_adj, b2_adj_cheat, notch=TRUE, 
-        main=bquote(paste("b2 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted" , "Adj_cheat"))
-abline(h = b2_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true, b3_naive,  b3_adj, b3_adj_cheat, notch=TRUE, 
-        main=bquote(paste("b3 Estimate", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_cheat"))
-abline(h = b3_true, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b1_true_se, b1_naive_se,  b1_adj_se, b1_adj_cheat_se, notch=TRUE, 
-        main=bquote(paste("b1 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_cheat"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b2_true_se, b2_naive_se,  b2_adj_se, b2_adj_cheat_se, notch=TRUE, 
-        main=bquote(paste("b2 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_cheat"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-par(mar=c(7.1,4.1,4.1,2.1))
-boxplot(b3_true_se, b3_naive_se,  b3_adj_se, b3_adj_cheat_se, notch=TRUE, 
-        main=bquote(paste("b3 Square Error", "\n mc_runs:", mc_runs, "\n m:", m)), 
-        cex.main=0.5,
-        las=2, names=c("True", "Naive", "Adjusted", "Adj_cheat"))
-abline(h = 0, col="red", lty=2, lwd=0.5)
-
-
-mean(b1_adj[abs(b1_adj)<10])
-mean(b1_adj_cheat[abs(b1_adj_cheat)<10])
-mean(b1_adj_ideal[abs(b1_adj_ideal)<10])
-mean(b1_naive[abs(b1_naive)<10])
-mean(b1_true)
-
-mean(b2_adj[abs(b2_adj)<10])
-mean(b2_adj_cheat[abs(b2_adj_cheat)<10])
-mean(b2_adj_ideal[abs(b2_adj_ideal)<10])
-mean(b2_naive[abs(b2_naive)<10])
-
-mean(b3_adj[abs(b3_adj)<10])
-mean(b3_adj_cheat[abs(b3_adj_cheat)<10])
-mean(b3_adj_ideal[abs(b3_adj_ideal)<10])
-mean(b3_naive[abs(b3_naive)<10])
